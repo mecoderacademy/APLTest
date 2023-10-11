@@ -20,10 +20,10 @@ namespace APLTest.Services
            _fileStorageContext = fileStorageContext;
     }
 
-        public FileUpload StoreImageDetails(FileUpload fileUpload)
+        public async Task<FileUpload> StoreImageDetailsAsync(FileUpload fileUpload)
         {
-           _fileStorageContext.FileUploads.AddAsync(fileUpload);
-            _fileStorageContext.SaveChangesAsync();
+           await _fileStorageContext.FileUploads.AddAsync(fileUpload);
+            await _fileStorageContext.SaveChangesAsync();
              return _fileStorageContext?.FileUploads?.SingleOrDefault(x => x.UniqueReference == fileUpload.UniqueReference);
         }
 

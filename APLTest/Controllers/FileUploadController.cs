@@ -7,6 +7,7 @@ namespace APLTest.Web.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Produces("application/json")]
     public class FileUploadController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
@@ -22,17 +23,18 @@ namespace APLTest.Web.Controllers
             _fileService = fileService;
         }
 
-        [HttpGet(Name = nameof(PostImageUploadAsync))]
-        public async Task<IActionResult> PostImageUploadAsync(IFormFile file)
+        [HttpPost(Name = "FileUpload")]
+        public async Task<IActionResult> PostImageUploadAsync(IFormFile fileToUpload)
         {
             
-            if (file == null || file.Length <= 0) return BadRequest(Constants.No_File_Found);
-            if (file.ContentType!=Constants.Png_Mime || file.ContentType!= Constants.Jpeg_Mime) return BadRequest(Constants.Wrong_Image_Type);
+            if (fileToUpload == null || fileToUpload.Length <= 0) return BadRequest(Constants.No_File_Found);
+            if (fileToUpload.ContentType!=Constants.Png_Mime && fileToUpload.ContentType!= Constants.Jpeg_Mime) return BadRequest(Constants.Wrong_Image_Type);
 
 
-            var fileUpload = await _fileService.UploadFile(await ConvertFormFileToBytes(file), file.FileName, file.ContentType);
-
-            return Created(fileUpload.Location, Constants.File_Uploaded_Successful);
+            var fileUpload = await _fileService.UploadFile(await ConvertFormFileToBytes(fileToUpload), fileToUpload.FileName, fileToUpload.ContentType);
+            if (string.IsNullOrEmpty(fileUpload.Location)) return BadRequest(Constants.Error_uploading_file);
+            await _fileService.StoreImageDetailsAsync(fileUpload);
+            return Created(string.Empty, fileUpload);
         }
 
         private async Task<byte[]> ConvertFormFileToBytes(IFormFile formFile)

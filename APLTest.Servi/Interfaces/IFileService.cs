@@ -10,6 +10,6 @@ namespace APLTest.Services.Interfaces
     public interface IFileService
     {
         public Task<FileUpload> UploadFile(byte[] data, string fileName, string fileType);
-        public FileUpload StoreImageDetails(FileUpload fileUpload);
+        public Task<FileUpload> StoreImageDetailsAsync(FileUpload fileUpload);
     }
 }

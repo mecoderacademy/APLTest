@@ -12,6 +12,7 @@ namespace APLTest.Data
         {
             modelBuilder.Entity<FileUpload>().HasKey(x => x.Id);
             modelBuilder.Entity<FileUpload>().Ignore(x => x.AdditionalInfo);
+            
 
         }
 

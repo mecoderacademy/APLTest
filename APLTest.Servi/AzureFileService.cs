@@ -17,7 +17,7 @@ namespace APLTest.Services
 
         public AzureFileService(FileStorageContext fileStorageContext,IConfiguration configuration, ILogger<AzureFileService> logger)
         {
-
+            _configuration = configuration;
             var connectionString = _configuration.GetConnectionString("AzureBlobStorage");
             _blobServiceClient = new BlobServiceClient(connectionString);
             _containerName = configuration["AzureBlobStorageContainer"];
@@ -26,10 +26,10 @@ namespace APLTest.Services
 
         }
 
-        public FileUpload StoreImageDetails(FileUpload fileUpload)
+        public async Task<FileUpload> StoreImageDetailsAsync(FileUpload fileUpload)
         {
-            _fileStorageContext.FileUploads.AddAsync(fileUpload);
-            _fileStorageContext.SaveChangesAsync();
+            await _fileStorageContext.FileUploads.AddAsync(fileUpload);
+            await _fileStorageContext.SaveChangesAsync();
             return _fileStorageContext?.FileUploads?.SingleOrDefault(x => x.UniqueReference == fileUpload.UniqueReference);
         }
 
@@ -51,17 +51,31 @@ namespace APLTest.Services
                 using (var stream = new MemoryStream(data))
                 {
                     var blobInfo = await uploadClient.UploadAsync(stream);
+                    var response = blobInfo.GetRawResponse();
+                    if (response.IsError) {
+                        return new FileUpload()
+                        {
+                            AdditionalInfo = { { "badFile", Constants.Error_uploading_file} }
+                        };
+                    }
                 }
+
+                string url = uploadClient?.Uri?.ToString() ?? string.Empty;
+                var addtionalInfo = new Dictionary<string,string>{ { "uploadSuccessfull", Constants.File_Uploaded_Successful } };
+                var uploadedAt = DateTime.UtcNow;
+                var totalSize = data.Length;
+                var fileTypeObj = fileType;
+                var storageType = StorageType.cloud;
 
                 return new FileUpload()
                 {
-                    Location = uploadClient.Uri.ToString(),
-                    AdditionalInfo = { { "uploadSuccessfull", Constants.File_Uploaded_Successful } },
-                    Name = fileName,
-                    UploadedAt = DateTime.UtcNow,
-                    TotalSize = data.Length,
-                    FileType = fileType,
-                    StorageType = StorageType.cloud
+                    Location = url,
+                    AdditionalInfo = addtionalInfo,
+                    Name = fileName ?? string.Empty,
+                    UploadedAt = uploadedAt,
+                    TotalSize = totalSize,
+                    FileType = fileTypeObj,
+                    StorageType = storageType,                   
                 };
             }
             catch (Exception ex)
@@ -69,7 +83,7 @@ namespace APLTest.Services
                 _logger.LogError(ex.ToString());
                 return new FileUpload()
                 {
-                    AdditionalInfo = new Dictionary<string, string> { { "uploadFailed", Constants.No_File_Found } }
+                    AdditionalInfo = new Dictionary<string, string> { { "uploadFailed", ex.ToString() } }
                 };
             }
         }

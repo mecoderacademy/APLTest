@@ -7,7 +7,7 @@
         public static string Wrong_Image_Type = "Wrong file type. should be an image type of png or jpeg";
         public static string Error_uploading_file = "Error uploading file";
         public static string Jpeg_Mime = "image/jpeg";
-        public static string Png_Mime = "image/jpeg";
+        public static string Png_Mime = "image/png";
 
 
     }
