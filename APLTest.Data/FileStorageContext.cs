@@ -6,8 +6,13 @@ namespace APLTest.Data
 {
     public class FileStorageContext : DbContext
     {
-        public FileStorageContext(DbContextOptions<FileStorageContext> dbContextOptions) : base(dbContextOptions) { }
-
+        //public FileStorageContext() { }
+        public FileStorageContext(DbContextOptions<FileStorageContext> dbContextOptions) : base(dbContextOptions) 
+        {
+            Database.EnsureDeleted();
+            Database.EnsureCreated();
+        }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<FileUpload>().HasKey(x => x.Id);

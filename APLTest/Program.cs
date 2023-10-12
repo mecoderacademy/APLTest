@@ -6,13 +6,18 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
+SqliteConnection sqliteConnection;
+sqliteConnection = new SqliteConnection("Filename=:memory:");
+sqliteConnection.Open();
 
 builder.Services.AddControllers().AddNewtonsoftJson();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped(typeof(IFileService), typeof(AzureFileService));
-builder.Services.AddDbContext<FileStorageContext>(options => options.UseSqlite(new SqliteConnection("Filename=:memory:")));
+builder.Services.AddScoped(typeof(IFileService), typeof(LocalFileService));
+builder.Services.AddScoped<DbContext,FileStorageContext>();
+builder.Services.AddDbContext<FileStorageContext>(options => options.UseSqlite(sqliteConnection));
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
