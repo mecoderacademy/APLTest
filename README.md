@@ -23,6 +23,7 @@ Steps 1:
 - In reality I would have mocked the front end first with tests before spinning up the backend
 - I also had issues with conversion to JSON when returing the response back to client side and I had to add a "produce" attribute at the top of the API controller class
 - I was able to successfully return the object back to the client and render the image
+- I then figured out that I cant run EF migrations with a sqlite in memory database so but ensured the DB is created and deleted in which solves issue of saving
 
 
   
