@@ -15,7 +15,7 @@ builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped(typeof(IFileService), typeof(AzureFileService));
-builder.Services.AddScoped(typeof(IFileService), typeof(LocalFileService));
+
 builder.Services.AddScoped<DbContext,FileStorageContext>();
 builder.Services.AddDbContext<FileStorageContext>(options => options.UseSqlite(sqliteConnection));
 builder.Services.AddCors(options =>

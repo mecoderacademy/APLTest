@@ -27,7 +27,7 @@ namespace APLTest.Services
              return _fileStorageContext?.FileUploads?.SingleOrDefault(x => x.UniqueReference == fileUpload.UniqueReference);
         }
 
-        public async Task<FileUpload> Upload(byte[] data, string fileName, string fileType)
+        public async Task<FileUpload> UploadFile(byte[] data, string fileName, string fileType)
         {
             try
             {
@@ -68,9 +68,6 @@ namespace APLTest.Services
             }
         }
 
-        public Task<FileUpload> UploadFile(byte[] data, string fileName, string fileType)
-        {
-            throw new NotImplementedException();
-        }
+       
     }
 }
